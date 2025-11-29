@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio Pie Chart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Chart.js for the pie chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .box {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #020617;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 6px;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      color: #9ca3af;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #22c55e;
+      color: #04101f;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Portfolio Pie Chart</h1>
+    <p>Type your assets and amounts, then click “Calculate”.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Asset name</th>
+          <th>Amount ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input id="a1" type="text" value="Stocks"></td>
+          <td><input id="v1" type="number" value="10000"></td>
+        </tr>
+        <tr>
+          <td><input id="a2" type="text" value="Bonds"></td>
+          <td><input id="v2" type="number" value="5000"></td>
+        </tr>
+        <tr>
+          <td><input id="a3" type="text" value="Cash"></td>
+          <td><input id="v3" type="number" value="2000"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="result"></div>
+
+    <canvas id="pie" style="max-width: 500px; margin-top: 16px;"></canvas>
+  </div>
+
+  <script>
+    let chart;
+
+    function calculate() {
+      // Read values
+      const names = [
+        document.getElementById('a1').value || 'Asset 1',
+        document.getElementById('a2').value || 'Asset 2',
+        document.getElementById('a3').value || 'Asset 3'
+      ];
+
+      const amounts = [
+        parseFloat(document.getElementById('v1').value) || 0,
+        parseFloat(document.getElementById('v2').value) || 0,
+        parseFloat(document.getElementById('v3').value) || 0
+      ];
+
+      const total = amounts.reduce((a, b) => a + b, 0);
+
+      const resultDiv = document.getElementById('result');
+
+      if (total <= 0) {
+        resultDiv.textContent = 'Please enter some positive amounts.';
+        if (chart) chart.destroy();
+        return;
+      }
+
+      // Show text result
+      let html = `Total portfolio: $${total.toLocaleString()}<br>`;
+      html += '<ul>';
+      for (let i = 0; i < 3; i++) {
+        const pct = (amounts[i] / total) * 100;
+        html += `<li>${names[i]}: $${amounts[i].toLocaleString()} (${pct.toFixed(1)}%)</li>`;
+      }
+      html += '</ul>';
+      resultDiv.innerHTML = html;
+
+      // Draw pie chart
+      const ctx = document.getElementById('pie').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: names,
+          datasets: [{
+            data: amounts
+          }]
+        }
+      });
+    }
+
+    // Draw initial chart on load
+    calculate();
+  </script>
+</body>
+</html>
+
